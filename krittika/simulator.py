@@ -70,6 +70,7 @@ class Simulator:
         self.trace_gen_flag = save_traces
 
         self.reports_dir_path = reports_dir_path
+        self.top_path = reports_dir_path + "/"
 
         self.params_valid = True
 

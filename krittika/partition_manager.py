@@ -140,12 +140,22 @@ class PartitionManager:
             opt_matmul_runtime, opt_matmul_part_entries =  \
                 self.search_matmul_layer_opt_config(layer_id=layer_id, part_list=part_list,
                                                     dataflow_list=matmul_dataflow_list)
+            print(f"Layer ID: {layer_id}")
+            print(f"Opt Matmul Runtime: {opt_matmul_runtime}")
+            print(f"Opt Matmul Dataflow: {opt_matmul_part_entries[1]}")
+            print(f"Opt Matmul Inp Partitions: {opt_matmul_part_entries[2]}")
+            print(f"Opt Matmul Filter Partitions: {opt_matmul_part_entries[3]}")
 
         if use_vector:
             assert vec_dataflow_list is not None
             opt_vector_runtime, opt_vector_part_entries = \
                 self.search_vector_layer_opt_config(layer_id=layer_id, part_list=part_list,
                                                     dataflow_list=vec_dataflow_list)
+            print(f"Layer ID: {layer_id}")
+            print(f"Opt Vec Runtime: {opt_vector_runtime}")
+            print(f"Opt Vec Dataflow: {opt_vector_part_entries[1]}")
+            print(f"Opt Vec Inp Partitions: {opt_matmul_part_entries[2]}")
+            print(f"Opt Vec Filter Partitions: {opt_matmul_part_entries[3]}")
 
         if use_matmul and use_vector:
             if opt_matmul_runtime < opt_vector_runtime:
