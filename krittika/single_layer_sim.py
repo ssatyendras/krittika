@@ -182,11 +182,15 @@ class SingleLayerSim:
         per_core_ifmap_bw, per_core_filter_bw, per_core_ofmap_bw\
             = self.config_obj.get_interface_bandwidths()
 
+        flag_est_bw_mode = True
+        if (self.config_obj.get_bandwidth_use_mode()=="USER"):
+            flag_est_bw_mode = False
+        
         for compute_node in self.compute_node_list:
 
             this_part_mem = double_buffered_scratchpad()
             this_part_mem.set_params(verbose=self.verbose,
-                                     estimate_bandwidth_mode=bandwidth_mode,
+                                     estimate_bandwidth_mode=flag_est_bw_mode,
                                      ifmap_buf_size_bytes=per_core_ifmap_buf_size,
                                      filter_buf_size_bytes=per_core_fitler_buf_size,
                                      ofmap_buf_size_bytes=per_core_ofmap_buf_size,
