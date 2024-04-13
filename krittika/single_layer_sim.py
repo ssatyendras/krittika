@@ -138,8 +138,17 @@ class SingleLayerSim:
                                                     ofmap_opmat=ofmap_part)
                 this_part_compute_node.calc_demand_matrices()
 
+                ###################################################################
+                num_computations = this_part_compute_node.get_num_compute()
+                print(f"# Part: ({inp_part},{filt_part}) :: Computations: {num_computations}")  
+                print(f"op_outmat= {this_part_compute_node.ofmap_matrix.shape}")
+                print(f"op_inmat1={this_part_compute_node.ifmap_matrix.shape}")
+                print(f"op_inmat2={this_part_compute_node.filter_matrix.shape}")
+                
+                ###################################################################              
+                
                 self.compute_node_list += [this_part_compute_node]
-
+        print(self.compute_node_list)
         self.compute_done = True
         
     #
@@ -175,16 +184,14 @@ class SingleLayerSim:
     def run_mem_sim_all_parts(self):
         assert self.compute_done
 
-        bandwidth_mode = self.config_obj.get_bandwidth_use_mode()
+        flag_est_bw_mode = True
+        if (self.config_obj.get_bandwidth_use_mode()=="USER"):
+            flag_est_bw_mode = False
         per_core_ifmap_buf_size, per_core_fitler_buf_size, per_core_ofmap_buf_size \
             = ([i * 1024 for i in self.config_obj.get_per_unit_sram_sizes_kb()])
 
         per_core_ifmap_bw, per_core_filter_bw, per_core_ofmap_bw\
             = self.config_obj.get_interface_bandwidths()
-
-        flag_est_bw_mode = True
-        if (self.config_obj.get_bandwidth_use_mode()=="USER"):
-            flag_est_bw_mode = False
         
         for compute_node in self.compute_node_list:
 
@@ -205,13 +212,15 @@ class SingleLayerSim:
 
             this_node_ifmap_fetch_mat, this_node_filter_fetch_mat = compute_node.get_prefetch_matrices()
             if (self.config_obj.get_bandwidth_use_mode()=="USER"):
-                this_part_mem.set_read_buf_prefetch_matrices(ifmap_prefetch_mat=this_node_ifmap_fetch_mat,
-                                                         filter_prefetch_mat=this_node_filter_fetch_mat
-                                                         )
+                this_part_mem.set_read_buf_prefetch_matrices(
+                        ifmap_prefetch_mat=this_node_ifmap_fetch_mat,
+                        filter_prefetch_mat=this_node_filter_fetch_mat
+                    )
+            print("Starting simulation of memory")                                            
             this_part_mem.service_memory_requests(this_node_ifmap_demand_mat,
                                                   this_node_filter_demand_mat,
                                                   this_node_ofmap_demand_mat)
-
+            print("Ended simulation of memory") 
             self.all_node_mem_objects += [this_part_mem]
 
         self.mem_traces_done = True
